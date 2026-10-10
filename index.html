@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1B2A41">
+<meta name="robots" content="noindex">
+<title>Plan 12 semanas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* Layout: barra institucional azul noche arriba, una columna de tarjetas de trabajo, números en tipografía mono */
+:root{
+  --bg:#F2F5F8; --card:#FFFFFF; --fg:#1C2533; --muted:#5B6770; --line:#CCD5DF;
+  --noche:#1B2A41; --inst:#1F4E8C; --soft:#E6EDF5; --bar-fg:#FFFFFF; --ok:#2E7D5B; --warn:#8A5A00;
+  --serie2:#9BB3D1;
+  --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0F1621; --card:#17212F; --fg:#E3E9F0; --muted:#97A3AF; --line:#2B3949;
+  --noche:#0B111A; --inst:#6E9FDB; --soft:#1F2C3D; --bar-fg:#E3E9F0; --ok:#5CBF8F; --warn:#E0B060;
+  --serie2:#3D5A80; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0F1621; --card:#17212F; --fg:#E3E9F0; --muted:#97A3AF; --line:#2B3949;
+  --noche:#0B111A; --inst:#6E9FDB; --soft:#1F2C3D; --bar-fg:#E3E9F0; --ok:#5CBF8F; --warn:#E0B060;
+  --serie2:#3D5A80; color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.45;margin:0}
+header{background:var(--noche);color:var(--bar-fg);padding:14px 16px 0;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.hwrap{max-width:720px;margin:0 auto}
+header h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.01em}
+.sub{font-size:13px;opacity:.8;margin:2px 0 10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sync{font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid currentColor;border-radius:4px;padding:1px 6px;opacity:.85}
+nav{display:flex}
+nav button{flex:1;background:transparent;border:0;color:var(--bar-fg);opacity:.65;padding:10px 4px;font:inherit;font-size:14px;border-bottom:3px solid transparent;cursor:pointer}
+nav button.on{opacity:1;border-color:var(--inst);font-weight:600}
+nav button:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--inst);outline-offset:2px}
+main{max-width:720px;margin:0 auto;padding-block:16px 32px;padding-inline:16px;display:grid;gap:12px}
+section{display:grid;gap:12px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;min-width:0}
+.card h2{margin:0 0 6px;font-size:15px;color:var(--inst);text-wrap:balance}
+.lbl{margin:14px 0 6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.plan p{margin:6px 0}
+.plan b{color:var(--fg)}
+.muted{color:var(--muted);font-size:13px}
+.meta{font-family:var(--mono);background:var(--soft);border-radius:4px;padding:2px 8px;font-size:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+label.f{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+input[type=number],input[type=date]{width:100%;padding:10px;font:inherit;font-family:var(--mono);font-size:16px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--fg)}
+.check{display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--inst);flex:none}
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.daynav .t{text-align:center;min-width:0}
+.daynav .t b{display:block;font-size:17px}
+.daynav .t span{font-size:13px;color:var(--muted)}
+.nb{background:var(--inst);color:#fff;border:0;border-radius:6px;width:44px;height:40px;font-size:20px;cursor:pointer}
+.nb:disabled{opacity:.3;cursor:default}
+.btn{background:var(--inst);color:#fff;border:0;border-radius:6px;padding:10px 14px;font:inherit;font-size:14px;cursor:pointer}
+.status{font-size:12px;height:16px;margin-top:8px;color:var(--ok)}
+.status.err{color:var(--warn)}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--noche);color:var(--bar-fg);text-align:left;padding:7px 6px;font-weight:600}
+td{padding:8px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+td.n{font-family:var(--mono)}
+tr[data-n]{cursor:pointer}
+tr.hoy td{background:var(--soft)}
+td.ok{color:var(--ok);font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+.kpi b{display:block;font-family:var(--mono);font-size:20px}
+.kpi span{font-size:12px;color:var(--muted)}
+.bar{height:6px;background:var(--soft);border-radius:3px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--inst)}
+.chart{position:relative;height:230px}
+.empty{color:var(--muted);font-size:13px;padding:8px 0}
+.login{min-height:100vh;display:grid;place-items:center;padding-inline:16px}
+.login form{width:100%;max-width:360px;display:grid;gap:10px}
+.login h1{margin:0 0 6px;font-size:20px;color:var(--fg)}
+.login input{width:100%;padding:10px;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--fg)}
+.pinmsg{color:var(--warn);font-size:13px;min-height:18px;margin:0}
+@media (max-width:420px){ .kpi b{font-size:17px} }
+@media (prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+
+</head>
+<body>
+<div id="login" class="login" hidden>
+  <form id="loginForm" class="card">
+    <h1>Plan de 12 semanas</h1>
+    <label class="f" for="pin">PIN de acceso</label>
+    <input type="password" id="pin" autocomplete="current-password" inputmode="text">
+    <button class="btn" type="submit">Entrar</button>
+    <p class="pinmsg" id="pinMsg" aria-live="polite"></p>
+  </form>
+</div>
+<div id="app">
+<header>
+  <div class="hwrap">
+    <h1>Plan de 12 semanas</h1>
+    <div class="sub"><span id="sub">Cargando…</span><span class="sync" id="sync">Conectando</span></div>
+    <nav>
+      <button id="t-hoy" data-v="hoy" class="on">Día</button>
+      <button id="t-semana" data-v="semana">Semana</button>
+      <button id="t-progreso" data-v="progreso">Progreso</button>
+      <button id="t-ajustes" data-v="ajustes">Ajustes</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section id="v-hoy">
+    <div class="daynav">
+      <button class="nb" id="prev" aria-label="Día anterior">‹</button>
+      <div class="t"><b id="dTitle"></b><span id="dSub"></span></div>
+      <button class="nb" id="next" aria-label="Día siguiente">›</button>
+    </div>
+    <div class="card plan" id="planDia"></div>
+    <div class="card">
+      <h2>Registro del día</h2>
+      <div class="grid2">
+        <div><label class="f" for="f-pasos">Pasos</label><input type="number" id="f-pasos" inputmode="numeric" min="0"></div>
+        <div><label class="f" for="f-sueno">Horas de sueño</label><input type="number" id="f-sueno" inputmode="decimal" step="0.5" min="0" max="14"></div>
+        <div><label class="f" for="f-cig">Cigarros</label><input type="number" id="f-cig" inputmode="numeric" min="0"></div>
+        <div><label class="f" for="f-tragos">Tragos</label><input type="number" id="f-tragos" inputmode="numeric" min="0"></div>
+      </div>
+      <div class="lbl">Cumplí</div>
+      <label class="check"><input type="checkbox" id="f-mov"> Movimiento del día</label>
+      <label class="check"><input type="checkbox" id="f-com"> Hábito de comida</label>
+      <label class="check"><input type="checkbox" id="f-hab"> Sueño y hábitos</label>
+      <div id="control" hidden>
+        <div class="lbl">Control semanal</div>
+        <div class="grid2">
+          <div><label class="f" for="f-peso">Peso (kg)</label><input type="number" id="f-peso" inputmode="decimal" step="0.1"></div>
+          <div><label class="f" for="f-cintura">Cintura (cm)</label><input type="number" id="f-cintura" inputmode="decimal" step="0.5"></div>
+        </div>
+      </div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="v-semana" hidden>
+    <div class="daynav">
+      <button class="nb" id="wprev" aria-label="Semana anterior">‹</button>
+      <div class="t"><b id="wTitle"></b><span id="wSub"></span></div>
+      <button class="nb" id="wnext" aria-label="Semana siguiente">›</button>
+    </div>
+    <div class="card tw"><table id="wTable"></table></div>
+    <p class="muted">Toca un día para abrirlo. ✓ = pasos de la meta y las tres casillas marcadas.</p>
+  </section>
+
+  <section id="v-progreso" hidden>
+    <div class="kpis" id="kpis"></div>
+    <div class="card"><h2>Peso semanal (kg)</h2><div class="chart"><canvas id="chPeso"></canvas></div><p class="muted">Se anota en el control del día 7 de cada semana. Una baja razonable es 0,5–1 kg por semana.</p></div>
+    <div class="card"><h2>Pasos diarios y meta</h2><div class="chart"><canvas id="chPasos"></canvas></div></div>
+    <div class="card"><h2>Horas de sueño</h2><div class="chart"><canvas id="chSueno"></canvas></div><p class="muted">Las barras oscuras marcan noches de menos de 4 horas.</p></div>
+    <div class="card"><h2>Cigarros y tragos por semana</h2><div class="chart"><canvas id="chHab"></canvas></div></div>
+  </section>
+
+  <section id="v-ajustes" hidden>
+    <div class="card">
+      <h2>Fecha del día 1</h2>
+      <input type="date" id="inicio">
+      <p class="muted">El plan asume que el día 1 es lunes, pero puedes partir cualquier día.</p>
+    </div>
+    <div class="card">
+      <h2>Peso inicial (kg)</h2>
+      <input type="number" id="pesoIni" inputmode="decimal" step="0.1">
+    </div>
+    <div class="card">
+      <h2>Dónde se guardan los datos</h2>
+      <p class="muted">En un almacenamiento privado de tu cuenta de Vercel. Para entrar desde otro dispositivo usa el mismo PIN.</p>
+      <button class="btn" id="salir" type="button">Cerrar sesión en este dispositivo</button>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+// ===== Plan (mismo contenido que el Word) =====
+const DIAS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const PASOS=[4000,5000,6000,7000,7000,7500,8000,8000,8500,9000,9500,10000];
+const TIPS=['Caminar mientras habla por teléfono','Bajarse una parada antes o estacionar más lejos','Usar escaleras en vez de ascensor','Vuelta de 10 min después de almuerzo','Ir a pie a un trámite o compra cercana','Paseo de 15–20 min con calma','Caminata libre, al ritmo que acomode'];
+const COMIDA=['Agua o bebidas sin azúcar en vez de bebidas azucaradas y jugos','Mitad del plato con verduras en almuerzo y cena','Servir siempre en plato; nada directo del paquete','Colación planificada (fruta, yogur natural o frutos secos en porción chica)','Incluir proteína en el desayuno (huevo, yogur, quesillo)','Planificar el menú del fin de semana con anticipación','Cena más liviana y al menos 2 h antes de dormir','Dejar dulces y snacks fuera de la vista','Un vaso de agua antes de cada comida','Comer más lento y sin pantallas','Mantener el mismo esquema el fin de semana','Repasar los 11 cambios y reforzar el que más cueste'];
+const SUENO=['Hora fija de levantarse, también el fin de semana','Pantallas fuera 30 min antes de dormir','Pieza oscura, fresca y sin ruido','Hora fija de acostarse','Meta 6,5–7 h. Café solo hasta las 15:00','Meta 6,5–7 h. Café solo hasta las 15:00','Meta 6,5–7 h. Si hubo una noche de 2 h, anotarlo','Meta 7 h. Revisar el registro de sueño del mes','Meta 7 h','Meta 7 h','Meta 7 h','Meta 7 h'];
+const FOCO=['Medir el punto de partida y empezar a caminar más.','Subir pasos y ordenar la hora de dormir.','Afianzar hábitos; agendar el chequeo médico.','Cerrar la fase 1 con 7.000 pasos diarios.','Empieza la fuerza 2 veces por semana y el alcohol baja a 2 días.','Fuerza y alcohol en 2 días se vuelven rutina.','Fuerza sube a 20 minutos; vigilar el sueño.','Cerrar la fase 2 con 8.000 pasos y 7 horas de sueño.','Llegan las caminatas rápidas; preparar el plan para dejar el tabaco.','Ir sacando cigarros automáticos antes del día D.','Día D sin tabaco; fuerza 3 veces por semana.','Consolidar: 10.000 pasos, sin tabaco, alcohol 2 días.'];
+const FASES=['Fase 1: activar sin agotar','Fase 2: fuerza y alcohol','Fase 3: consolidar y dejar el tabaco'];
+const FUERZA='Silla: 3×8–10 · Flexiones en pared: 3×8–10 · Remo con mochila: 3×10 por brazo · Plancha en rodillas: 3×15–20 s · Escalón: 3×1 min';
+
+function movimiento(w,d){
+  if(w<4) return (w===0&&d===0?'Medir pasos de un día normal (línea base). ':'')+TIPS[d];
+  if(w<8){const m=w<6?'15':'20'; if(d===0||d===3) return `Rutina de fuerza (${m} min) + pasos del día`; return TIPS[d];}
+  const c=['20','25','30','30'][w-8];
+  if(d===0||d===3||(w>=10&&d===5)) return 'Rutina de fuerza (20 min), sumando 1–2 repeticiones';
+  if(d===1||d===4||d===6) return `Caminata rápida de ${c} min (poder hablar, no cantar)`;
+  return TIPS[d];
+}
+function comida(w,d){const b=COMIDA[w]; if(d===0) return 'NUEVO: '+b; if(w>0&&d===3) return b+'. Revisar que siga lo de semanas anteriores'; return b;}
+function alcohol(w,d){ if(w<4) return d===0?'Alcohol: anotar tragos de la semana':null; return (d===4||d===5)?'Día con alcohol permitido: tope fijado antes, alternar con agua':'Sin alcohol';}
+function tabaco(w,d){
+  if(w===0&&d===0) return 'Tabaco: anotar cigarros por día';
+  if(w===2&&d===0) return 'Pedir hora EMPA en el CESFAM si aún no se hace';
+  if(w===8){ if(d===0) return 'Anotar los cigarros "automáticos" (café, comida, auto)'; if(d===2) return 'Pedir apoyo en CESFAM o médico para dejar de fumar'; if(d===6) return 'Fijar la fecha para dejar de fumar: día 71';}
+  if(w===9){ if(d===0) return 'Eliminar el cigarro con el café'; if(d===3) return 'Eliminar también el cigarro después de comer'; if(d===6) return 'Botar cigarros y encendedores en casa y auto';}
+  if(w===10) return d===0?'DÍA D: hoy se deja de fumar':'Sin tabaco. Ante las ganas: agua, caminar 5 min, esperar que pase';
+  if(w===11) return 'Sin tabaco';
+  return null;
+}
+function planDe(n){
+  const w=Math.floor((n-1)/7), d=(n-1)%7, mov=movimiento(w,d);
+  return {w,d,pasos:PASOS[w],mov,fuerza:mov.startsWith('Rutina de fuerza'),comida:comida(w,d),hab:[SUENO[w],alcohol(w,d),tabaco(w,d)].filter(Boolean),control:d===6};
+}
+
+// ===== Estado y almacenamiento =====
+// Los datos viven en Vercel Blob (privado) y se leen/escriben a través de /api/datos, protegido con PIN.
+const $=id=>document.getElementById(id);
+let S={inicio:null,pesoIni:null,dias:{}};
+let modo='cargando';
+const PKEY='plan12-pin';
+function getPin(){ try{ return localStorage.getItem(PKEY)||''; }catch(e){ return ''; } }
+function setPin(p){ try{ if(p) localStorage.setItem(PKEY,p); else localStorage.removeItem(PKEY); }catch(e){} }
+
+function iso(dt){ const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),d=String(dt.getDate()).padStart(2,'0'); return `${y}-${m}-${d}`; }
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function nextMonday(){ const t=new Date(); t.setHours(0,0,0,0); const k=(8-t.getDay())%7; if(t.getDay()!==1) t.setDate(t.getDate()+k); return iso(t); }
+function inicio(){ return S.inicio||nextMonday(); }
+function fechaDe(n){ const f=parse(inicio()); f.setDate(f.getDate()+n-1); return f; }
+function diaHoy(){ const ms=new Date().setHours(0,0,0,0)-parse(inicio()).getTime(); return Math.min(84,Math.max(1,Math.round(ms/864e5)+1)); }
+const fmt=n=>n==null||n===''?'–':Number(n).toLocaleString('es-CL');
+const fFecha=f=>f.toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+
+function setSync(t){ $('sync').textContent=t; }
+
+async function api(method,body){
+  const r=await fetch('/api/datos',{method,headers:{'Content-Type':'application/json','x-pin':getPin()},body:body?JSON.stringify(body):undefined,cache:'no-store'});
+  if(r.status===401){ const e=new Error('pin'); e.pin=true; throw e; }
+  if(!r.ok) throw new Error('http '+r.status);
+  return r.json();
+}
+
+let editing=false;
+function refresh(){ header(); if(!editing) show(view,true); }
+
+async function cargar(){
+  if(!getPin()){ pedirPin(); return; }
+  setSync('Cargando');
+  try{
+    const d=await api('GET');
+    S={inicio:d.inicio||null,pesoIni:d.pesoIni??null,dias:d.dias||{}};
+    $('login').hidden=true; $('app').hidden=false;
+    $('inicio').value=inicio(); $('pesoIni').value=S.pesoIni??'';
+    modo='ok'; setSync('Sincronizado');
+    if(!cargado){ cur=diaHoy(); curW=Math.floor((cur-1)/7); cargado=true; }
+    refresh();
+  }catch(e){
+    if(e.pin){ setPin(''); pedirPin('PIN incorrecto. Intenta de nuevo.'); }
+    else setSync('Sin conexión');
+  }
+}
+let cargado=false;
+function pedirPin(msg){
+  $('app').hidden=true; $('login').hidden=false;
+  $('pinMsg').textContent=msg||''; $('pin').value=''; $('pin').focus();
+}
+$('loginForm').addEventListener('submit',e=>{ e.preventDefault(); const p=$('pin').value.trim(); if(!p) return; setPin(p); cargar(); });
+$('salir').onclick=()=>{ setPin(''); pedirPin(); };
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && getPin() && !editing) cargar(); });
+
+// Guardado: una escritura a la vez, se envía el estado completo.
+let pend=Promise.resolve(), sucio=false;
+function persistir(){
+  sucio=true;
+  pend=pend.then(async()=>{
+    if(!sucio) return;
+    sucio=false;
+    setSync('Guardando');
+    await api('PUT',S);
+    setSync('Sincronizado');
+  });
+  return pend;
+}
+async function escribirDia(){ return persistir(); }
+async function escribirConfig(){ return persistir(); }
+
+// ===== Vista Día =====
+let cur=1, curW=0, view='hoy';
+const campos=['pasos','sueno','cig','tragos','peso','cintura'], checks=['mov','com','hab'];
+
+function renderDia(){
+  const p=planDe(cur), r=S.dias[cur]||{};
+  $('dTitle').textContent=`Día ${cur} de 84`;
+  $('dSub').textContent=`Semana ${p.w+1} · ${fFecha(fechaDe(cur))}`;
+  $('planDia').innerHTML=`
+    <h2>${FASES[Math.floor(p.w/4)]}</h2>
+    <p class="muted">${FOCO[p.w]}</p>
+    <p>Meta de pasos <span class="meta">${fmt(p.pasos)}</span></p>
+    <p><b>Movimiento:</b> ${p.mov}</p>
+    ${p.fuerza?`<p class="muted">${FUERZA}</p>`:''}
+    <p><b>Comida:</b> ${p.comida}</p>
+    <p><b>Sueño y hábitos:</b> ${p.hab.join(' · ')}</p>`;
+  campos.forEach(c=>$('f-'+c).value=r[c]??'');
+  checks.forEach(c=>$('f-'+c).checked=!!r[c]);
+  $('control').hidden=!p.control;
+  $('prev').disabled=cur<=1; $('next').disabled=cur>=84;
+}
+function guardarDia(){
+  const n=cur, r={};
+  campos.forEach(c=>{const v=$('f-'+c).value; if(v!=='') r[c]=Number(v);});
+  checks.forEach(c=>{ if($('f-'+c).checked) r[c]=true; });
+  if(Object.keys(r).length) S.dias[n]=r; else delete S.dias[n];
+  $('status').className='status'; $('status').textContent='Guardando…';
+  escribirDia(n,r).then(()=>{ $('status').textContent='Guardado'; })
+    .catch(()=>{ $('status').className='status err'; $('status').textContent='No se pudo guardar. Revisa tu conexión e intenta de nuevo.'; });
+}
+[...campos,...checks].forEach(c=>{
+  const el=$('f-'+c);
+  el.addEventListener('focus',()=>editing=true);
+  el.addEventListener('blur',()=>editing=false);
+  el.addEventListener('change',guardarDia);
+});
+$('prev').onclick=()=>{cur--;renderDia();};
+$('next').onclick=()=>{cur++;renderDia();};
+
+// ===== Vista Semana =====
+function cumplido(n){ const r=S.dias[n]||{}; return (r.pasos||0)>=planDe(n).pasos && r.mov && r.com && r.hab; }
+function renderSemana(){
+  const w=curW, hoy=diaHoy();
+  $('wTitle').textContent=`Semana ${w+1}`;
+  $('wSub').textContent=`Días ${w*7+1} a ${w*7+7} · meta ${fmt(PASOS[w])} pasos`;
+  let h='<tr><th>Día</th><th>Pasos</th><th>Sueño</th><th>Cig.</th><th>Tragos</th><th>Cumplí</th></tr>';
+  for(let d=0;d<7;d++){
+    const n=w*7+d+1, r=S.dias[n]||{}, ok=cumplido(n), k=checks.filter(c=>r[c]).length;
+    h+=`<tr class="${n===hoy?'hoy':''}" data-n="${n}"><td>${n} · ${DIAS[d]}</td><td class="n">${fmt(r.pasos)}</td><td class="n">${fmt(r.sueno)}</td><td class="n">${fmt(r.cig)}</td><td class="n">${fmt(r.tragos)}</td><td class="${ok?'ok':''}">${ok?'✓':k+'/3'}</td></tr>`;
+  }
+  const c=S.dias[w*7+7]||{};
+  h+=`<tr><td colspan="6" class="muted">Control: peso ${fmt(c.peso)} kg · cintura ${fmt(c.cintura)} cm</td></tr>`;
+  $('wTable').innerHTML=h;
+  $('wTable').querySelectorAll('tr[data-n]').forEach(tr=>tr.onclick=()=>{cur=+tr.dataset.n;show('hoy');});
+  $('wprev').disabled=w<=0; $('wnext').disabled=w>=11;
+}
+$('wprev').onclick=()=>{curW--;renderSemana();};
+$('wnext').onclick=()=>{curW++;renderSemana();};
+
+// ===== Vista Progreso =====
+const charts={};
+function tok(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function chart(id,cfg){ if(charts[id]) charts[id].destroy(); charts[id]=new Chart($(id),cfg); }
+function renderProgreso(){
+  const hoy=diaHoy(), dias=[...Array(84)].map((_,i)=>i+1);
+  const semanas=[...Array(12)].map((_,w)=>S.dias[w*7+7]?.peso).filter(v=>v!=null);
+  const ini=S.pesoIni ?? semanas[0], ult=semanas.length?semanas[semanas.length-1]:null;
+  const cumpl=dias.filter(n=>n<=hoy&&cumplido(n)).length, reg=Object.keys(S.dias).length;
+  const dif=ult!=null&&ini!=null?ult-ini:null;
+  $('kpis').innerHTML=`
+    <div class="kpi"><b>${dif==null?'–':(dif>0?'+':'')+dif.toFixed(1).replace('.',',')}</b><span>kg desde el inicio</span></div>
+    <div class="kpi"><b>${cumpl}/${hoy}</b><span>días cumplidos</span><div class="bar"><i style="width:${cumpl/hoy*100}%"></i></div></div>
+    <div class="kpi"><b>${reg}/84</b><span>días registrados</span><div class="bar"><i style="width:${reg/84*100}%"></i></div></div>`;
+  if(typeof Chart==='undefined') return;
+  const C={fg:tok('--muted'),line:tok('--line'),inst:tok('--inst'),noche:tok('--fg'),s2:tok('--serie2')};
+  Chart.defaults.font.family=tok('--sans'); Chart.defaults.color=C.fg; Chart.defaults.borderColor=C.line;
+  Chart.defaults.maintainAspectRatio=false;
+  const xDia={ticks:{maxTicksLimit:12,callback:(v,i)=>'D'+(i+1)},grid:{display:false}};
+  const sem=[...Array(12)].map((_,i)=>'S'+(i+1));
+  chart('chPeso',{type:'line',data:{labels:['Inicio',...sem],datasets:[{label:'Peso',data:[S.pesoIni??null,...[...Array(12)].map((_,w)=>S.dias[w*7+7]?.peso??null)],borderColor:C.inst,backgroundColor:C.inst,spanGaps:true,tension:.25,pointRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{title:{display:true,text:'kg'}},x:{grid:{display:false}}}}});
+  chart('chPasos',{data:{labels:dias,datasets:[
+    {type:'bar',label:'Pasos',data:dias.map(n=>S.dias[n]?.pasos??null),backgroundColor:C.inst},
+    {type:'line',label:'Meta',data:dias.map(n=>planDe(n).pasos),borderColor:C.noche,borderDash:[5,4],borderWidth:1.5,pointRadius:0,stepped:true}
+  ]},options:{scales:{x:xDia}}});
+  chart('chSueno',{data:{labels:dias,datasets:[
+    {type:'bar',label:'Horas',data:dias.map(n=>S.dias[n]?.sueno??null),backgroundColor:dias.map(n=>(S.dias[n]?.sueno??9)<4?C.noche:C.s2)},
+    {type:'line',label:'Meta 7 h',data:dias.map(()=>7),borderColor:C.inst,borderDash:[5,4],borderWidth:1.5,pointRadius:0}
+  ]},options:{scales:{x:xDia,y:{min:0,max:10}}}});
+  const sum=(w,k)=>{let s=0,a=false;for(let d=1;d<=7;d++){const v=S.dias[w*7+d]?.[k]; if(v!=null){s+=v;a=true;}} return a?s:null;};
+  chart('chHab',{type:'bar',data:{labels:sem,datasets:[
+    {label:'Cigarros',data:[...Array(12)].map((_,w)=>sum(w,'cig')),backgroundColor:C.noche},
+    {label:'Tragos',data:[...Array(12)].map((_,w)=>sum(w,'tragos')),backgroundColor:C.s2}
+  ]},options:{scales:{x:{grid:{display:false}}}}});
+}
+
+// ===== Ajustes =====
+$('inicio').onchange=e=>{ if(e.target.value){ S.inicio=e.target.value; escribirConfig().catch(()=>{}); cur=diaHoy(); curW=Math.floor((cur-1)/7); header(); } };
+$('pesoIni').onchange=e=>{ S.pesoIni=e.target.value===''?null:Number(e.target.value); escribirConfig().catch(()=>{}); };
+
+// ===== Navegación =====
+function header(){
+  const hoy=new Date().setHours(0,0,0,0), ini=parse(inicio()).getTime();
+  $('sub').textContent= hoy<ini ? `Parte el ${fFecha(parse(inicio()))}` : `Hoy es el día ${diaHoy()} de 84`;
+}
+function show(v,keep){
+  view=v;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  ['hoy','semana','progreso','ajustes'].forEach(x=>$('v-'+x).hidden=x!==v);
+  if(v==='hoy') renderDia();
+  if(v==='semana'){ if(!keep) curW=Math.floor((cur-1)/7); renderSemana(); }
+  if(v==='progreso') renderProgreso();
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.v));
+
+header(); cargar();
+</script>
+
+</body>
+</html>
